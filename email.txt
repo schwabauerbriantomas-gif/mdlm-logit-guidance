@@ -1,0 +1,16 @@
+To: nieshen@ruc.edu.cn
+Cc: liuchongxuan@ruc.edu.cn
+Subject: Empirical study: logit-level guidance on LLaDA-8B (extends Diffusion-LM to 8B scale)
+
+Dear Shen Nie and Chongxuan Liu,
+
+I am writing to share an empirical study applying logit-level guidance to LLaDA-8B-Instruct. This is purely informational.
+
+The base technique — injecting a guidance signal into the model's logits at each denoising step — was established by Diffusion-LM (Li & Liang, ACL 2022). My work extends it to LLaDA-8B using gradient-free energy vectors derived from the model's own embedding matrix (a single matrix-vector product per step, no backpropagation). Across 13 experiments, the optimal configuration achieved +39% semantic steering over baseline while maintaining coherence. The steering is effective for distinctive vocabulary (horror sim=0.44, ocean sim=0.34) but limited for common vocabulary where model priors dominate (cooking sim=0.07, space sim=0.18). A fundamental limitation emerged: the technique steers token selection but not narrative structure.
+
+Everything is documented and reproducible at: https://github.com/schwabauerbriantomas-gif/mdlm-logit-guidance
+
+No response expected. If you find any part useful for your research, you are welcome to it. If you spot errors, corrections are welcome.
+
+Best regards,
+Brian Schwabauer
