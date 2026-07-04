@@ -1,6 +1,11 @@
 # Logit-Level Guidance on Masked Diffusion Language Models
 
-Empirical characterization of energy-guided logit injection on **LLaDA-8B-Instruct**, an 8B-parameter masked diffusion language model.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Model: LLaDA-8B](https://img.shields.io/badge/Model-LLaDA--8B-blue.svg)](https://arxiv.org/abs/2502.09992)
+[![Base: Diffusion-LM](https://img.shields.io/badge/Technique-Diffusion--LM_2022-green.svg)](https://arxiv.org/abs/2205.14217)
+[![Experiments: 13](https://img.shields.io/badge/Experiments-13-orange.svg)](data/)
+
+Empirical characterization of **energy-guided logit injection** on **LLaDA-8B-Instruct**, an 8B-parameter masked diffusion language model. Extends the logit guidance technique from [Diffusion-LM](https://arxiv.org/abs/2205.14217) (Li & Liang, ACL 2022) to billion-parameter scale using gradient-free pre-computed energy vectors.
 
 ## What This Is
 
@@ -85,11 +90,34 @@ Each experiment takes ~7 minutes (2 min model load + 5 min generation).
 │   ├── ...
 │   └── e13_cosall_a10_blended.jsonl
 ├── notebooks/
-│   └── analysis.ipynb            # Visualizations and statistical analysis
+│   ├── analysis.py               # Reproduces all visualizations
+│   ├── experiment_comparison.png  # Bar chart: 13 experiments
+│   ├── topic_heatmap.png          # Heatmap: per-topic effectiveness
+│   └── alpha_sweep.png            # Alpha vs effectiveness curve
 ├── docs/
-│   └── SECURITY_ANALYSIS.md      # Threat model and security framing
+│   └── SECURITY_ANALYSIS.md      # Architectural implications and threat model
 └── README.md
 ```
+
+## Full Results Table
+
+| Experiment | Strategy | α | Schedule | Norm | Score | sim_mean | good% |
+|------------|----------|---|----------|------|-------|----------|-------|
+| e00 | logit_additive | 5 | constant | abs_max | mean_emb | 0.184 | 62% |
+| e01 | logit_additive | 5 | linear_up | z_score | mean_emb | 0.092 | 12% |
+| e02 | prob_additive | 5 | constant | abs_max | mean_emb | 0.096 | 12% |
+| e03 | logit_additive | 10 | cosine | abs_max | mean_emb | 0.237 | 62% |
+| e04 | logit_additive | 15 | cosine | abs_max | mean_emb | 0.272 | 33% |
+| e05 | logit_additive | 10 | cosine | min_max | mean_emb | 0.293 | 100%* |
+| **e06** | **logit_additive** | **10** | **cosine** | **abs_max** | **cosine_all** | **0.257** | **75%** |
+| e07 | logit_additive | 10 | cosine | abs_max | cosine_all | 0.257 | 75% |
+| e08 | logit_additive | 10 | cosine | abs_max | cosine_all | 0.222 | 50% |
+| e09 | logit_additive | 10 | cosine | abs_max | cosine_all | 0.184 | 50% |
+| e11 | logit_additive | 10 | cosine | abs_max | cosine_all | 0.245 | 58% |
+| e12 | logit_additive | 10 | cosine | abs_max | cosine_all | 0.155 | 25% |
+| e13 | logit_blended | 10 | cosine | abs_max | cosine_all | 0.194 | 62% |
+
+\* e05 achieved 100% on valid outputs only; 3/8 were degenerate (excluded)
 
 ## Data Format
 
@@ -117,6 +145,25 @@ Each `.jsonl` file contains one JSON object per line:
 - The guidance technique builds on **Diffusion-LM** (Li & Liang, ACL 2022, [arXiv:2205.14217](https://arxiv.org/abs/2205.14217))
 - The model is **LLaDA-8B-Instruct** by Nie et al. ([arXiv:2502.09992](https://arxiv.org/abs/2502.09992))
 - The experimental methodology follows **Karpathy's autoresearch** approach
+
+## Citation
+
+If you reference this work:
+
+```bibtex
+@misc{schwabauer2026mdlm_guidance,
+  title     = {Logit-Level Guidance on Masked Diffusion Language Models:
+               An Empirical Study on LLaDA-8B},
+  author    = {Brian Schwabauer},
+  year      = {2026},
+  url       = {https://github.com/schwabauerbriantomas-gif/mdlm-logit-guidance},
+  note      = {Extends Diffusion-LM (Li \& Liang, ACL 2022) to 8B scale}
+}
+```
+
+Key references:
+- **LLaDA**: Nie et al., "Large Language Diffusion Models," arXiv:2502.09992 (2025)
+- **Diffusion-LM**: Li & Liang, "Diffusion-LM Improves Controllable Text Generation," ACL 2022
 
 ## License
 
